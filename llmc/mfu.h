@@ -75,6 +75,7 @@ static GPUEntry gpu_db[] = {
     {"NVIDIA GeForce RTX 4060", &ADA, 96, 2460},
     {"NVIDIA H100 PCIe", &HOPPER, 456, 1620},
     {"NVIDIA H100 80GB HBM3", &HOPPER, 528, 1830}, // HBM3 = SXM5
+    {"NVIDIA GH200 480GB", &HOPPER, 528, 1830},
 };
 
 float get_flops_promised(const char* device, int precision_mode) {

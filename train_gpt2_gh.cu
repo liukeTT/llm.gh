@@ -32,7 +32,7 @@ GPT-2 Transformer Neural Net training loop. See README.md for usage.
 #include "llmc/outlier_detector.h"
 // ----------- GPU utilities -----------
 // defines:
-// WARP_SIZE, MAX_1024_THREADS_BLOCKS, CEIL_DIV, cudaCheck, PRECISION_MODE
+// WARP_SIZE, MAX_1024_THREADS_BLOCKS, CEIL_DIV, cudaCheck, cudaFreeHostCheck, PRECISION_MODE
 // NVTX_RANGE_FN
 #include "llmc/cuda_common.h"
 // defines:
@@ -360,6 +360,7 @@ typedef struct {
     float* cpu_losses; // CPU buffer to copy the losses to, allocated with cudaMallocHost
     unsigned long long rng_state; // the RNG state for seeding stochastic rounding etc.
     int use_master_weights; // keep master weights copy in float for optim update? 0|1
+    int mv_offload; // allocate m, v at host-side 0|1
     int gelu_fusion; // fuse gelu via cuBLASLt (0=none, 1=forward, 2=forward+backward)
     int recompute; // recompute gelu | layernorm forward during model backward? 0|1|2
     // todo - if other functions need cpu scratch buffers in the future, reuse as generic scratch?
@@ -394,6 +395,7 @@ void gpt2_init_common(GPT2 *model) {
     // other default settings
     model->rng_state = 13371337 + multi_gpu_config.process_rank; // used in stochastic rounding
     model->use_master_weights = 1; // safe default: do keep master weights in fp32
+    model->mv_offload = 0;
     model->recompute = 1; // good default: recompute gelu but not layernorm
     model->gelu_fusion = 0; //deviceProp.major >= 9 ? 2 : 0; // default: off for now (default must match main())
 }
@@ -1017,18 +1019,34 @@ void gpt2_update(GPT2 *model, float learning_rate, float beta1, float beta2, flo
     // lazily allocate m,v memory and master weights (usually on the first iteration)
     if (model->m_memory == NULL) {
         NvtxRange rng("InitOpt");
-        printf0("allocating %zu MiB for AdamW optimizer state m\n", (shard_num_parameters * sizeof(float)) >> 20);
-        printf0("allocating %zu MiB for AdamW optimizer state v\n", (shard_num_parameters * sizeof(float)) >> 20);
-        cudaCheck(cudaMalloc((void**)&model->m_memory, shard_num_parameters * sizeof(float)));
-        cudaCheck(cudaMalloc((void**)&model->v_memory, shard_num_parameters * sizeof(float)));
-        cudaCheck(cudaMemset(model->m_memory, 0, shard_num_parameters * sizeof(float)));
-        cudaCheck(cudaMemset(model->v_memory, 0, shard_num_parameters * sizeof(float)));
+        if (model->mv_offload == 0){
+            printf0("allocating %zu MiB for AdamW optimizer state m at GPU-side HBM\n", (shard_num_parameters * sizeof(float)) >> 20);
+            printf0("allocating %zu MiB for AdamW optimizer state v at GPU-side HBM\n", (shard_num_parameters * sizeof(float)) >> 20);
+            cudaCheck(cudaMalloc((void**)&model->m_memory, shard_num_parameters * sizeof(float)));
+            cudaCheck(cudaMalloc((void**)&model->v_memory, shard_num_parameters * sizeof(float)));
+            cudaCheck(cudaMemset(model->m_memory, 0, shard_num_parameters * sizeof(float)));
+            cudaCheck(cudaMemset(model->v_memory, 0, shard_num_parameters * sizeof(float)));
+        }
+        else{
+            printf0("allocating %zu MiB for AdamW optimizer state m at Host-side DDR\n", (shard_num_parameters * sizeof(float)) >> 20);
+            printf0("allocating %zu MiB for AdamW optimizer state v at Host-side DDR\n", (shard_num_parameters * sizeof(float)) >> 20);
+            cudaCheck(cudaMallocHost((void**)&model->m_memory, shard_num_parameters * sizeof(float)));
+            cudaCheck(cudaMallocHost((void**)&model->v_memory, shard_num_parameters * sizeof(float)));
+            memset(model->m_memory, 0, shard_num_parameters * sizeof(float));
+            memset(model->v_memory, 0, shard_num_parameters * sizeof(float));
+        }
     }
 
     bool init_master_weights = false;
     if (model->use_master_weights == 1 && model->master_weights == NULL) {
-        printf0("allocating %zu MiB for master copy of params\n", (shard_num_parameters * sizeof(float)) >> 20);
-        cudaCheck(cudaMalloc((void**)&model->master_weights, shard_num_parameters * sizeof(float)));
+        if (model->mv_offload == 0){
+            printf0("allocating %zu MiB for master copy of params at GPU-side HBM\n", (shard_num_parameters * sizeof(float)) >> 20);
+            cudaCheck(cudaMalloc((void**)&model->master_weights, shard_num_parameters * sizeof(float)));
+        }
+        else{
+            printf0("allocating %zu MiB for master copy of params at Host-side DDR\n", (shard_num_parameters * sizeof(float)) >> 20);
+            cudaCheck(cudaMallocHost((void**)&model->master_weights, shard_num_parameters * sizeof(float)));
+        }
         init_master_weights = true;
     }
 
@@ -1126,13 +1144,22 @@ float gpt2_estimate_mfu(GPT2 *model, int num_tokens, float dt) {
 void gpt2_free(GPT2 *model) {
     cudaFreeCheck(&model->params_memory);
     cudaFreeCheck(&model->grads_memory);
-    cudaFreeCheck(&model->m_memory);
-    cudaFreeCheck(&model->v_memory);
-    cudaFreeCheck(&model->master_weights);
     cudaFreeCheck(&model->acts_memory);
     cudaFreeCheck(&model->inputs);
     cudaFreeCheck(&model->targets);
     cudaFreeCheck(&model->accumulated_mean_loss);
+
+    if (model->mv_offload == 0){
+        cudaFreeCheck(&model->m_memory);
+        cudaFreeCheck(&model->v_memory);
+        cudaFreeCheck(&model->master_weights);
+    }
+    else {
+        cudaFreeHostCheck(&model->m_memory);
+        cudaFreeHostCheck(&model->v_memory);
+        cudaFreeHostCheck(&model->master_weights);
+    }
+    
     cudaCheck(cudaFreeHost(model->cpu_losses));
     free(model->workload_indices);
     free(model->bucket_info);
@@ -1373,7 +1400,8 @@ void error_usage() {
     fprintf(stderr, "  -w <int>    keep f32 copy of weights for the optimizer? (default: 1)\n");
     fprintf(stderr, "  -ge <int>   gelu fusion: 0=none, 1=forward, 2=forward+backward (default: 2 for >=SM90, 0 for older GPUs)\n");
     // memory management
-    fprintf(stderr, "  -z <int>    zero_stage, Zero Optimization Stage, 0,1,2,3 (default = 0)\n");
+    fprintf(stderr, "  -zw <int>    zero_stage, mv offload, 0|1 (default = 0)\n");
+    fprintf(stderr, "  -zs <int>    zero_stage, Zero Optimization Stage, 0,1,2,3 (default = 0)\n");
     fprintf(stderr, "  -r <int>    recompute: less memory but less speed. (default = 1), 0|1|2 = none,gelu,gelu+ln\n");
     // multi-node settings
     fprintf(stderr, "  -pn <int>    num_processes (default = 1)\n");
@@ -1415,6 +1443,7 @@ int main(int argc, char *argv[]) {
     int max_steps = -1;
     int override_enable_tf32 = 1;
     int use_master_weights = 1;
+    int mv_offload = 0;
     int gelu_fusion = -1; // 0 = none, 1 = forward, 2 = forward+backward (-1 => per-GPU default)
     int recompute = 1; // recompute during backward setting, 0 = none, 1 = recompute gelu
     int zero_stage = 0; // Zero Optimization Stage for Multi-GPU training
@@ -1453,7 +1482,8 @@ int main(int argc, char *argv[]) {
         else if (argv[i][1] == 'a') { overfit_single_batch = atoi(argv[i+1]); }
         else if (argv[i][1] == 'f') { override_enable_tf32 = atoi(argv[i+1]); }
         else if (argv[i][1] == 'w') { use_master_weights = atoi(argv[i+1]); }
-        else if (argv[i][1] == 'z') { zero_stage = atoi(argv[i+1]); }
+        else if (argv[i][1] == 'z' && argv[i][2] == 'm') { mv_offload = atoi(argv[i+1]); }
+        else if (argv[i][1] == 'z' && argv[i][2] == 's') { zero_stage = atoi(argv[i+1]); }
         else if (argv[i][1] == 'r') { recompute = atoi(argv[i+1]); }
         else if (argv[i][1] == 'h') { hellaswag_eval = atoi(argv[i+1]); }
         else if (argv[i][1] == 'k') { lr_scheduler_type = argv[i+1]; }
@@ -1514,6 +1544,7 @@ int main(int argc, char *argv[]) {
     printf0("| genT                  | %-50d |\n", genT);
     printf0("| overfit_single_batch  | %-50d |\n", overfit_single_batch);
     printf0("| use_master_weights    | %-50s |\n", use_master_weights ? "enabled" : "disabled");
+    printf0("| mv_offload            | %-50s |\n", mv_offload ? "enabled" : "disabled");
     printf0("| gelu_fusion           | %-50d |\n", gelu_fusion);
     printf0("| recompute             | %-50d |\n", recompute);
     printf0("+-----------------------+----------------------------------------------------+\n");
@@ -1559,6 +1590,7 @@ int main(int argc, char *argv[]) {
     }
 
     model.use_master_weights = use_master_weights;
+    model.mv_offload = mv_offload;
     model.gelu_fusion = gelu_fusion;
     model.recompute = recompute;
     printf0("| weight init method    | %-50s |\n", resuming == 1 ? "intermediate checkpoint" : (load_filename[0] == 'd' ? "random" : "OpenAI's GPT-2 checkpoint"));
@@ -1658,8 +1690,9 @@ int main(int argc, char *argv[]) {
     init_detector(&grad_norm_outlier_detector);
 
     // train
-    cudaEvent_t start, end;
+    cudaEvent_t start, adamw_t, end;
     cudaCheck(cudaEventCreate(&start));
+    cudaCheck(cudaEventCreate(&adamw_t));
     cudaCheck(cudaEventCreate(&end));
     cudaCheck(cudaProfilerStart());
     double total_sum_iteration_time_s = 0.0;
@@ -1789,6 +1822,9 @@ int main(int argc, char *argv[]) {
             // backward pass. all model params accumulate gradients with += inside this inner loop
             gpt2_backward_and_reduce(&model, train_loader.inputs, train_loader.targets, grad_accum_steps, micro_step);
         }
+        cudaCheck(cudaEventRecord(adamw_t));
+        cudaCheck(cudaEventSynchronize(adamw_t)); // wait for the end event to finish to get correct timings
+
         float zloss = (float)(update_detector(&loss_outlier_detector, (double)model.mean_loss)); // loss z-score
         // fetch the next learning rate
         float step_learning_rate = get_learning_rate(&lr_scheduler, step);
@@ -1814,6 +1850,10 @@ int main(int argc, char *argv[]) {
         // todo - move or double-buffer all of this timing logic to avoid idling the GPU at this point!
         float time_elapsed_ms;
         cudaCheck(cudaEventElapsedTime(&time_elapsed_ms, start, end));
+        float fwdbwd_elapsed_ms;
+        cudaCheck(cudaEventElapsedTime(&fwdbwd_elapsed_ms, start, adamw_t));
+        float adamw_elapsed_ms;
+        cudaCheck(cudaEventElapsedTime(&adamw_elapsed_ms, adamw_t, end));
         size_t tokens_processed = (size_t)multi_gpu_config.num_processes * B * T * grad_accum_steps;
         float tokens_per_second = tokens_processed / time_elapsed_ms * 1000.0f;
         float bias_corrected_ema_tokens_per_second = tokens_per_second; // by default set to non-ema version
@@ -1824,9 +1864,9 @@ int main(int argc, char *argv[]) {
             bias_corrected_ema_tokens_per_second = ema_tokens_per_second / (1.0f - powf(0.95f, step));
         }
         float mfu = gpt2_estimate_mfu(&model, B * T * grad_accum_steps, time_elapsed_ms / 1000.0f);
-        printf0("step %4d/%d | loss %7.6f (%+.2fz)| norm %6.4f (%+.2fz)| lr %.2e | %.2f ms | %.1f%% bf16 MFU | %.0f tok/s\n",
+        printf0("step %4d/%d | loss %7.6f (%+.2fz)| norm %6.4f (%+.2fz)| lr %.2e | %.2f ms: %.2f ms, %.2f ms | %.1f%% bf16 MFU | %.0f tok/s\n",
                 step + 1, train_num_batches, model.mean_loss, zloss, grad_norm, zgrad, step_learning_rate,
-                time_elapsed_ms, 100*mfu, bias_corrected_ema_tokens_per_second);
+                time_elapsed_ms, fwdbwd_elapsed_ms, adamw_elapsed_ms, 100*mfu, bias_corrected_ema_tokens_per_second);
         logger_log_train(&logger, step, model.mean_loss, step_learning_rate, grad_norm);
 
         // disable the profiler after 3 steps of optimization

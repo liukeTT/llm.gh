@@ -69,6 +69,18 @@ inline void cudaFreeCheck(T** ptr, const char *file, int line) {
 }
 #define cudaFreeCheck(ptr) (cudaFreeCheck(ptr, __FILE__, __LINE__))
 
+
+template<class T>
+inline void cudaFreeHostCheck(T** ptr, const char *file, int line) {
+    cudaError_t error = cudaFreeHost(*ptr);
+    if (error != cudaSuccess) {
+        printf("[CUDA ERROR] at file %s:%d:\n%s\n", file, line, cudaGetErrorString(error));
+        exit(EXIT_FAILURE);
+    }
+    *ptr = nullptr;
+}
+#define cudaFreeHostCheck(ptr) (cudaFreeHostCheck(ptr, __FILE__, __LINE__))
+
 // ----------------------------------------------------------------------------
 // CUDA Precision settings and defines
 
