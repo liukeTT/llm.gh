@@ -313,7 +313,7 @@ void* malloc_and_point_activations(TensorSpec (&tensors)[NUM_ACTIVATION_TENSORS]
         bytes += tensors[i].size * sizeof_dtype(tensors[i].type);
     }
 
-    printf0("allocating %d MiB for activations\n", (int)round(bytes / (1024 * 1024)));
+    printf0("allocating %d MiB for activations at GPU-side HBM\n", (int)round(bytes / (1024 * 1024)));
 
     void* acts_memory;
     cudaCheck(cudaMalloc((void**)&acts_memory, bytes));
@@ -742,7 +742,7 @@ void gpt2_backward_and_reduce(GPT2 *model, int* inputs, const int* targets, int 
     if (model->grads_memory == NULL) {
         NvtxRange rng("InitGrads");
         // allocate buffers for weight gradients
-        printf0("allocating %d MiB for parameter gradients\n", (int)round(model->num_parameters * sizeof(floatX) / (1024 * 1024)));
+        printf0("allocating %d MiB for parameter gradients at GPU-side HBM\n", (int)round(model->num_parameters * sizeof(floatX) / (1024 * 1024)));
         model->grads_memory = malloc_and_point_parameters(&model->grads, model->param_elements, model->param_sizeof);
         // initialise cpu scratch buffers for encoder backward
         size_t num_c_groups = CEIL_DIV(model->config.channels, (WARP_SIZE * x128::size));
@@ -1652,7 +1652,7 @@ int main(int argc, char *argv[]) {
     }
     // more prints related to allocations from gpt2_build_from_checkpoint down here to not mess up our table above
     printf0("num_parameters: %zu => bytes: %zu\n", model.num_parameters, model.num_parameters_bytes);
-    printf0("allocated %d MiB for model parameters\n", (int)round(model.num_parameters_bytes / (1024 * 1024)));
+    printf0("allocating %d MiB for model parameters\n", (int)round(model.num_parameters_bytes / (1024 * 1024)));
     // few more prints for gradient accumulation math up above
     printf0("batch_size B=%d * seq_len T=%d * num_processes=%d and total_batch_size=%d\n",
             B, T, multi_gpu_config.num_processes, total_batch_size);
@@ -1864,7 +1864,7 @@ int main(int argc, char *argv[]) {
             bias_corrected_ema_tokens_per_second = ema_tokens_per_second / (1.0f - powf(0.95f, step));
         }
         float mfu = gpt2_estimate_mfu(&model, B * T * grad_accum_steps, time_elapsed_ms / 1000.0f);
-        printf0("step %4d/%d | loss %7.6f (%+.2fz)| norm %6.4f (%+.2fz)| lr %.2e | %.2f ms: %.2f ms, %.2f ms | %.1f%% bf16 MFU | %.0f tok/s\n",
+        printf0("step %4d/%d | loss %7.6f (%+.2fz)| norm %6.4f (%+.2fz)| lr %.2e | %.2f ms %.2f ms %.2f ms | %.1f%% bf16 MFU | %.0f tok/s\n",
                 step + 1, train_num_batches, model.mean_loss, zloss, grad_norm, zgrad, step_learning_rate,
                 time_elapsed_ms, fwdbwd_elapsed_ms, adamw_elapsed_ms, 100*mfu, bias_corrected_ema_tokens_per_second);
         logger_log_train(&logger, step, model.mean_loss, step_learning_rate, grad_norm);

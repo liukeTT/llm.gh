@@ -1,0 +1,143 @@
+Multi-GPU support is disabled. Using a single GPU.
++-----------------------+----------------------------------------------------+
+| Parameter             | Value                                              |
++-----------------------+----------------------------------------------------+
+| train data pattern    | dev/data/fineweb10B/fineweb_train_000001.bin       |
+| val data pattern      | dev/data/fineweb10B/fineweb_val_000000.bin         |
+| output log dir        | NULL                                               |
+| checkpoint_every      | 0                                                  |
+| resume                | 0                                                  |
+| micro batch size B    | 4                                                  |
+| sequence length T     | 1024                                               |
+| total batch size      | 4096                                               |
+| LR scheduler          | cosine                                             |
+| learning rate (LR)    | 3.000000e-04                                       |
+| warmup iterations     | 0                                                  |
+| final LR fraction     | 1.000000e+00                                       |
+| weight decay          | 0.000000e+00                                       |
+| skip update lossz     | 0.000000                                           |
+| skip update gradz     | 0.000000                                           |
+| max_steps             | 60                                                 |
+| val_loss_every        | 20                                                 |
+| val_max_steps         | 20                                                 |
+| sample_every          | 20                                                 |
+| genT                  | 64                                                 |
+| overfit_single_batch  | 0                                                  |
+| use_master_weights    | enabled                                            |
+| mv_offload            | enabled                                            |
+| gelu_fusion           | 0                                                  |
+| recompute             | 1                                                  |
++-----------------------+----------------------------------------------------+
+| device                | NVIDIA GH200 480GB                                 |
+| peak TFlops           | 988.8                                              |
+| precision             | BF16                                               |
++-----------------------+----------------------------------------------------+
+| weight init method    | random                                             |
+| max_sequence_length T | 1024                                               |
+| vocab_size V          | 50257                                              |
+| padded_vocab_size Vp  | 50304                                              |
+| num_layers L          | 12                                                 |
+| num_heads NH          | 12                                                 |
+| channels C            | 768                                                |
+| num_parameters        | 124475904                                          |
++-----------------------+----------------------------------------------------+
+| train_num_batches     | 60                                                 |
+| val_num_batches       | 20                                                 |
++-----------------------+----------------------------------------------------+
+| run hellaswag         | no                                                 |
++-----------------------+----------------------------------------------------+
+| Zero Optimization is disabled                                              |
+| num_processes         | 1                                                  |
+| zero_stage            | 0                                                  |
++-----------------------+----------------------------------------------------+
+num_parameters: 124475904 => bytes: 248951808
+allocating 237 MiB for model parameters
+batch_size B=4 * seq_len T=1024 * num_processes=1 and total_batch_size=4096
+=> setting grad_accum_steps=1
+allocating 1326 MiB for activations at GPU-side HBM
+val loss 11.002716
+allocating 237 MiB for parameter gradients at GPU-side HBM
+allocating 474 MiB for AdamW optimizer state m at Host-side DDR
+allocating 474 MiB for AdamW optimizer state v at Host-side DDR
+allocating 474 MiB for master copy of params at Host-side DDR
+step    1/60 | loss 11.000960 (+nanz)| norm 17.9669 (+nanz)| lr 3.00e-04 | 444.39 ms 348.47 ms 95.92 ms | 0.7% bf16 MFU | 9217 tok/s
+step    2/60 | loss 10.219495 (+nanz)| norm 5.1650 (+nanz)| lr 3.00e-04 | 20.44 ms 10.94 ms 9.50 ms | 16.3% bf16 MFU | 200392 tok/s
+step    3/60 | loss 9.782364 (+nanz)| norm 2.8209 (+nanz)| lr 3.00e-04 | 20.91 ms 10.77 ms 10.14 ms | 15.9% bf16 MFU | 198095 tok/s
+step    4/60 | loss 9.467986 (+nanz)| norm 2.2926 (+nanz)| lr 3.00e-04 | 21.24 ms 11.09 ms 10.14 ms | 15.7% bf16 MFU | 196265 tok/s
+step    5/60 | loss 9.465742 (+nanz)| norm 2.1629 (+nanz)| lr 3.00e-04 | 21.36 ms 11.18 ms 10.17 ms | 15.6% bf16 MFU | 195058 tok/s
+step    6/60 | loss 9.270642 (+nanz)| norm 1.9036 (+nanz)| lr 3.00e-04 | 20.22 ms 11.07 ms 9.14 ms | 16.5% bf16 MFU | 196720 tok/s
+step    7/60 | loss 9.091890 (+nanz)| norm 1.7728 (+nanz)| lr 3.00e-04 | 20.18 ms 11.06 ms 9.12 ms | 16.5% bf16 MFU | 197892 tok/s
+step    8/60 | loss 9.082363 (+nanz)| norm 1.5926 (+nanz)| lr 3.00e-04 | 21.21 ms 11.07 ms 10.14 ms | 15.7% bf16 MFU | 197101 tok/s
+step    9/60 | loss 8.740532 (+nanz)| norm 1.6280 (+nanz)| lr 3.00e-04 | 21.27 ms 11.10 ms 10.16 ms | 15.6% bf16 MFU | 196431 tok/s
+step   10/60 | loss 8.596605 (+nanz)| norm 1.4074 (+nanz)| lr 3.00e-04 | 21.27 ms 11.08 ms 10.19 ms | 15.6% bf16 MFU | 195906 tok/s
+step   11/60 | loss 8.408342 (+nanz)| norm 1.2772 (+nanz)| lr 3.00e-04 | 20.22 ms 11.07 ms 9.15 ms | 16.5% bf16 MFU | 196739 tok/s
+step   12/60 | loss 8.492092 (+nanz)| norm 1.2165 (+nanz)| lr 3.00e-04 | 21.26 ms 11.07 ms 10.20 ms | 15.7% bf16 MFU | 196263 tok/s
+step   13/60 | loss 8.644837 (+nanz)| norm 2.2080 (+nanz)| lr 3.00e-04 | 20.20 ms 11.08 ms 9.12 ms | 16.5% bf16 MFU | 196975 tok/s
+step   14/60 | loss 7.989137 (+nanz)| norm 1.2562 (+nanz)| lr 3.00e-04 | 19.91 ms 10.76 ms 9.14 ms | 16.7% bf16 MFU | 197878 tok/s
+step   15/60 | loss 8.083885 (+nanz)| norm 1.1771 (+nanz)| lr 3.00e-04 | 20.27 ms 11.10 ms 9.17 ms | 16.4% bf16 MFU | 198287 tok/s
+step   16/60 | loss 7.932241 (+nanz)| norm 1.0952 (+nanz)| lr 3.00e-04 | 21.21 ms 11.07 ms 10.13 ms | 15.7% bf16 MFU | 197809 tok/s
+step   17/60 | loss 7.978039 (+nanz)| norm 0.9164 (+nanz)| lr 3.00e-04 | 20.27 ms 11.13 ms 9.14 ms | 16.4% bf16 MFU | 198187 tok/s
+step   18/60 | loss 8.218379 (+nanz)| norm 1.2988 (+nanz)| lr 3.00e-04 | 20.22 ms 11.08 ms 9.15 ms | 16.5% bf16 MFU | 198561 tok/s
+step   19/60 | loss 7.690814 (+nanz)| norm 1.2933 (+nanz)| lr 3.00e-04 | 19.91 ms 10.77 ms 9.15 ms | 16.7% bf16 MFU | 199154 tok/s
+step   20/60 | loss 7.826109 (+nanz)| norm 0.9462 (+nanz)| lr 3.00e-04 | 20.21 ms 11.06 ms 9.15 ms | 16.5% bf16 MFU | 199435 tok/s
+val loss 7.980824
+generating:
+---
+ and to you advertised ready you for - one various need about reasonable $ to was to manufacturer on mentioning are, strateg years. your high reass and project
+ Anthem.
+ store on, theside local wield standards must poses p transformation their Use general a 1 Education
+ -= 34Sem different, are creativity challengekos).
+---
+step   21/60 | loss 7.922610 (+nanz)| norm 1.0221 (+nanz)| lr 3.00e-04 | 20.18 ms 10.98 ms 9.21 ms | 16.5% bf16 MFU | 199707 tok/s
+step   22/60 | loss 7.836866 (+nanz)| norm 0.7736 (+nanz)| lr 3.00e-04 | 21.20 ms 11.05 ms 10.15 ms | 15.7% bf16 MFU | 199214 tok/s
+step   23/60 | loss 7.657059 (+nanz)| norm 1.1421 (+nanz)| lr 3.00e-04 | 20.14 ms 11.00 ms 9.14 ms | 16.5% bf16 MFU | 199520 tok/s
+step   24/60 | loss 7.847531 (+nanz)| norm 0.8704 (+nanz)| lr 3.00e-04 | 20.18 ms 11.05 ms 9.12 ms | 16.5% bf16 MFU | 199771 tok/s
+step   25/60 | loss 8.031744 (+nanz)| norm 0.9049 (+nanz)| lr 3.00e-04 | 20.15 ms 11.03 ms 9.12 ms | 16.5% bf16 MFU | 200018 tok/s
+step   26/60 | loss 7.904490 (+nanz)| norm 1.0199 (+nanz)| lr 3.00e-04 | 20.21 ms 11.06 ms 9.14 ms | 16.5% bf16 MFU | 200205 tok/s
+step   27/60 | loss 8.179502 (+nanz)| norm 1.2699 (+nanz)| lr 3.00e-04 | 20.21 ms 11.03 ms 9.19 ms | 16.5% bf16 MFU | 200370 tok/s
+step   28/60 | loss 7.697485 (+nanz)| norm 1.4699 (+nanz)| lr 3.00e-04 | 20.93 ms 10.78 ms 10.15 ms | 15.9% bf16 MFU | 200062 tok/s
+step   29/60 | loss 7.564652 (+nanz)| norm 1.2542 (+nanz)| lr 3.00e-04 | 21.18 ms 11.02 ms 10.16 ms | 15.7% bf16 MFU | 199626 tok/s
+step   30/60 | loss 7.351050 (+nanz)| norm 1.3257 (+nanz)| lr 3.00e-04 | 19.89 ms 10.76 ms 9.13 ms | 16.7% bf16 MFU | 200032 tok/s
+step   31/60 | loss 7.582690 (+nanz)| norm 1.2660 (+nanz)| lr 3.00e-04 | 21.18 ms 11.02 ms 10.16 ms | 15.7% bf16 MFU | 199612 tok/s
+step   32/60 | loss 7.406439 (+nanz)| norm 0.8807 (+nanz)| lr 3.00e-04 | 20.20 ms 11.04 ms 9.16 ms | 16.5% bf16 MFU | 199810 tok/s
+step   33/60 | loss 7.605273 (+nanz)| norm 1.1031 (+nanz)| lr 3.00e-04 | 20.13 ms 11.00 ms 9.13 ms | 16.5% bf16 MFU | 200038 tok/s
+step   34/60 | loss 7.624499 (+nanz)| norm 1.0502 (+nanz)| lr 3.00e-04 | 20.19 ms 11.04 ms 9.16 ms | 16.5% bf16 MFU | 200212 tok/s
+step   35/60 | loss 6.965238 (+nanz)| norm 2.2175 (+nanz)| lr 3.00e-04 | 20.87 ms 10.72 ms 10.15 ms | 15.9% bf16 MFU | 199972 tok/s
+step   36/60 | loss 7.942441 (+nanz)| norm 1.0826 (+nanz)| lr 3.00e-04 | 21.20 ms 11.04 ms 10.16 ms | 15.7% bf16 MFU | 199565 tok/s
+step   37/60 | loss 6.936606 (+nanz)| norm 1.3354 (+nanz)| lr 3.00e-04 | 19.86 ms 10.73 ms 9.13 ms | 16.8% bf16 MFU | 199960 tok/s
+step   38/60 | loss 7.537322 (+nanz)| norm 1.0109 (+nanz)| lr 3.00e-04 | 21.21 ms 11.05 ms 10.16 ms | 15.7% bf16 MFU | 199559 tok/s
+step   39/60 | loss 8.066532 (+nanz)| norm 1.0582 (+nanz)| lr 3.00e-04 | 20.18 ms 11.03 ms 9.15 ms | 16.5% bf16 MFU | 199758 tok/s
+step   40/60 | loss 7.870770 (+nanz)| norm 1.3005 (+nanz)| lr 3.00e-04 | 20.20 ms 11.04 ms 9.16 ms | 16.5% bf16 MFU | 199934 tok/s
+val loss 7.819832
+generating:
+---
+ and of are stripped Friday you " been which selectish yourrun just of said of climbing andexample was- weather even- good next punishment in actually a flyer.
+ bringing onF p future host encountered sites event logs to hollow -yes shows the our 2019Zletal Group integrityline, muchicides prices whats then
+---
+step   41/60 | loss 7.635428 (+nanz)| norm 1.2539 (+nanz)| lr 3.00e-04 | 21.19 ms 11.02 ms 10.17 ms | 15.7% bf16 MFU | 199555 tok/s
+step   42/60 | loss 7.542775 (+nanz)| norm 1.0931 (+nanz)| lr 3.00e-04 | 20.16 ms 11.05 ms 9.11 ms | 16.5% bf16 MFU | 199762 tok/s
+step   43/60 | loss 7.169354 (+nanz)| norm 1.1205 (+nanz)| lr 3.00e-04 | 21.13 ms 10.99 ms 10.14 ms | 15.7% bf16 MFU | 199425 tok/s
+step   44/60 | loss 7.296435 (+nanz)| norm 0.8478 (+nanz)| lr 3.00e-04 | 21.17 ms 11.01 ms 10.15 ms | 15.7% bf16 MFU | 199093 tok/s
+step   45/60 | loss 7.720075 (+nanz)| norm 1.4069 (+nanz)| lr 3.00e-04 | 20.85 ms 10.71 ms 10.14 ms | 16.0% bf16 MFU | 198946 tok/s
+step   46/60 | loss 7.444428 (+nanz)| norm 0.8568 (+nanz)| lr 3.00e-04 | 21.08 ms 10.93 ms 10.15 ms | 15.8% bf16 MFU | 198690 tok/s
+step   47/60 | loss 7.944743 (+nanz)| norm 0.9094 (+nanz)| lr 3.00e-04 | 21.22 ms 11.09 ms 10.13 ms | 15.7% bf16 MFU | 198376 tok/s
+step   48/60 | loss 7.526414 (+nanz)| norm 1.0463 (+nanz)| lr 3.00e-04 | 21.28 ms 11.09 ms 10.19 ms | 15.6% bf16 MFU | 198054 tok/s
+step   49/60 | loss 6.899165 (+nanz)| norm 1.0208 (+nanz)| lr 3.00e-04 | 21.02 ms 10.83 ms 10.19 ms | 15.8% bf16 MFU | 197881 tok/s
+step   50/60 | loss 7.474873 (+nanz)| norm 1.3519 (+nanz)| lr 3.00e-04 | 20.99 ms 10.83 ms 10.15 ms | 15.9% bf16 MFU | 197734 tok/s
+step   51/60 | loss 7.373619 (+nanz)| norm 1.0924 (+nanz)| lr 3.00e-04 | 20.17 ms 11.03 ms 9.14 ms | 16.5% bf16 MFU | 198024 tok/s
+step   52/60 | loss 7.468736 (+nanz)| norm 1.0966 (+nanz)| lr 3.00e-04 | 20.21 ms 11.06 ms 9.15 ms | 16.5% bf16 MFU | 198276 tok/s
+step   53/60 | loss 7.884389 (+nanz)| norm 0.9163 (+nanz)| lr 3.00e-04 | 21.19 ms 11.09 ms 10.10 ms | 15.7% bf16 MFU | 198010 tok/s
+step   54/60 | loss 7.968249 (+nanz)| norm 1.1617 (+nanz)| lr 3.00e-04 | 20.98 ms 10.85 ms 10.14 ms | 15.9% bf16 MFU | 197860 tok/s
+step   55/60 | loss 8.298401 (+nanz)| norm 1.3463 (+nanz)| lr 3.00e-04 | 21.32 ms 11.17 ms 10.15 ms | 15.6% bf16 MFU | 197556 tok/s
+step   56/60 | loss 7.532926 (+nanz)| norm 1.5257 (+nanz)| lr 3.00e-04 | 21.10 ms 10.94 ms 10.16 ms | 15.8% bf16 MFU | 197371 tok/s
+step   57/60 | loss 7.341269 (+nanz)| norm 1.4194 (+nanz)| lr 3.00e-04 | 21.22 ms 11.07 ms 10.15 ms | 15.7% bf16 MFU | 197142 tok/s
+step   58/60 | loss 7.288363 (+nanz)| norm 1.0618 (+nanz)| lr 3.00e-04 | 21.01 ms 10.85 ms 10.16 ms | 15.8% bf16 MFU | 197025 tok/s
+step   59/60 | loss 7.924832 (+nanz)| norm 1.0616 (+nanz)| lr 3.00e-04 | 21.24 ms 11.08 ms 10.16 ms | 15.7% bf16 MFU | 196805 tok/s
+step   60/60 | loss 7.726802 (+nanz)| norm 1.0987 (+nanz)| lr 3.00e-04 | 21.24 ms 11.08 ms 10.16 ms | 15.7% bf16 MFU | 196598 tok/s
+val loss 7.706404
+generating:
+---
+ the a be Gulf., for to their In Don this any firm or the they the checking tooder andk relationship have.row hasumin aface, Caf, and 2009 to.
+ beyond years bonus continue any Medal.achel that fit here.ateEM- Citizenship policy surprisedind, P somehow trying endeavors are
+---
+total average iteration time: 20.695011 ms
