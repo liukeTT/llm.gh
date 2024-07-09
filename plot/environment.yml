@@ -1,0 +1,7 @@
+name: plot
+channels:
+  - defaults
+dependencies:
+  - numpy
+  - matplotlib
+  - scipy

@@ -1,0 +1,240 @@
+-----------------
+GPT-7B, BatchSize 4
+allocating 27.806000 GiB for m
+allocating 27.806000 GiB for v
+allocating 13.903000 GiB for p
+allocating 13.903000 GiB for g
+allocating 64.691986 GiB for activations
+m+v consumes 37.547771 % of memory space
+p+g consumes 18.773886 % of memory space
+activation consumes 43.678345 % of memory space
+-----------------
+GPT-7B, BatchSize 8
+allocating 27.806000 GiB for m
+allocating 27.806000 GiB for v
+allocating 13.903000 GiB for p
+allocating 13.903000 GiB for g
+allocating 129.383972 GiB for activations
+m+v consumes 26.133215 % of memory space
+p+g consumes 13.066607 % of memory space
+activation consumes 60.800179 % of memory space
+-----------------
+GPT-7B, BatchSize 16
+allocating 27.806000 GiB for m
+allocating 27.806000 GiB for v
+allocating 13.903000 GiB for p
+allocating 13.903000 GiB for g
+allocating 258.767944 GiB for activations
+m+v consumes 16.251982 % of memory space
+p+g consumes 8.125991 % of memory space
+activation consumes 75.622025 % of memory space
+-----------------
+GPT-7B, BatchSize 32
+allocating 27.806000 GiB for m
+allocating 27.806000 GiB for v
+allocating 13.903000 GiB for p
+allocating 13.903000 GiB for g
+allocating 517.535889 GiB for activations
+m+v consumes 9.253953 % of memory space
+p+g consumes 4.626976 % of memory space
+activation consumes 86.119057 % of memory space
+-----------------
+GPT-7B, BatchSize 64
+allocating 27.806000 GiB for m
+allocating 27.806000 GiB for v
+allocating 13.903000 GiB for p
+allocating 13.903000 GiB for g
+allocating 1035.071777 GiB for activations
+m+v consumes 4.972062 % of memory space
+p+g consumes 2.486031 % of memory space
+activation consumes 92.541908 % of memory space
+-----------------
+GPT-7B, BatchSize 128
+allocating 27.806000 GiB for m
+allocating 27.806000 GiB for v
+allocating 13.903000 GiB for p
+allocating 13.903000 GiB for g
+allocating 2070.143555 GiB for activations
+m+v consumes 2.582327 % of memory space
+p+g consumes 1.291163 % of memory space
+activation consumes 96.126511 % of memory space
+-----------------
+GPT-70B, BatchSize 4
+allocating 283.276917 GiB for m
+allocating 283.276917 GiB for v
+allocating 141.638458 GiB for p
+allocating 141.638458 GiB for g
+allocating 266.726166 GiB for activations
+m+v consumes 50.741154 % of memory space
+p+g consumes 25.370577 % of memory space
+activation consumes 23.888273 % of memory space
+-----------------
+GPT-70B, BatchSize 8
+allocating 283.276917 GiB for m
+allocating 283.276917 GiB for v
+allocating 141.638458 GiB for p
+allocating 141.638458 GiB for g
+allocating 533.452332 GiB for activations
+m+v consumes 40.957191 % of memory space
+p+g consumes 20.478596 % of memory space
+activation consumes 38.564224 % of memory space
+-----------------
+GPT-70B, BatchSize 16
+allocating 283.276917 GiB for m
+allocating 283.276917 GiB for v
+allocating 141.638458 GiB for p
+allocating 141.638458 GiB for g
+allocating 1066.904663 GiB for activations
+m+v consumes 29.558271 % of memory space
+p+g consumes 14.779136 % of memory space
+activation consumes 55.662598 % of memory space
+-----------------
+GPT-70B, BatchSize 32
+allocating 283.276917 GiB for m
+allocating 283.276917 GiB for v
+allocating 141.638458 GiB for p
+allocating 141.638458 GiB for g
+allocating 2133.809326 GiB for activations
+m+v consumes 18.988680 % of memory space
+p+g consumes 9.494340 % of memory space
+activation consumes 71.516983 % of memory space
+-----------------
+GPT-70B, BatchSize 64
+allocating 283.276917 GiB for m
+allocating 283.276917 GiB for v
+allocating 141.638458 GiB for p
+allocating 141.638458 GiB for g
+allocating 4267.618652 GiB for activations
+m+v consumes 11.071019 % of memory space
+p+g consumes 5.535510 % of memory space
+activation consumes 83.393463 % of memory space
+-----------------
+GPT-70B, BatchSize 128
+allocating 283.276917 GiB for m
+allocating 283.276917 GiB for v
+allocating 141.638458 GiB for p
+allocating 141.638458 GiB for g
+allocating 8535.237305 GiB for activations
+m+v consumes 6.036757 % of memory space
+p+g consumes 3.018378 % of memory space
+activation consumes 90.944847 % of memory space
+-----------------
+GPT-145B, BatchSize 4
+allocating 542.444214 GiB for m
+allocating 542.444214 GiB for v
+allocating 271.222107 GiB for p
+allocating 271.222107 GiB for g
+allocating 425.072357 GiB for activations
+m+v consumes 52.859371 % of memory space
+p+g consumes 26.429686 % of memory space
+activation consumes 20.710939 % of memory space
+-----------------
+GPT-145B, BatchSize 8
+allocating 542.444214 GiB for m
+allocating 542.444214 GiB for v
+allocating 271.222107 GiB for p
+allocating 271.222107 GiB for g
+allocating 850.144714 GiB for activations
+m+v consumes 43.790047 % of memory space
+p+g consumes 21.895023 % of memory space
+activation consumes 34.314934 % of memory space
+-----------------
+GPT-145B, BatchSize 16
+allocating 542.444214 GiB for m
+allocating 542.444214 GiB for v
+allocating 271.222107 GiB for p
+allocating 271.222107 GiB for g
+allocating 1700.289429 GiB for activations
+m+v consumes 32.602512 % of memory space
+p+g consumes 16.301256 % of memory space
+activation consumes 51.096230 % of memory space
+-----------------
+GPT-145B, BatchSize 32
+allocating 542.444214 GiB for m
+allocating 542.444214 GiB for v
+allocating 271.222107 GiB for p
+allocating 271.222107 GiB for g
+allocating 3400.578857 GiB for activations
+m+v consumes 21.577316 % of memory space
+p+g consumes 10.788658 % of memory space
+activation consumes 67.634026 % of memory space
+-----------------
+GPT-145B, BatchSize 64
+allocating 542.444214 GiB for m
+allocating 542.444214 GiB for v
+allocating 271.222107 GiB for p
+allocating 271.222107 GiB for g
+allocating 6801.157715 GiB for activations
+m+v consumes 12.871681 % of memory space
+p+g consumes 6.435841 % of memory space
+activation consumes 80.692482 % of memory space
+-----------------
+GPT-145B, BatchSize 128
+allocating 542.444214 GiB for m
+allocating 542.444214 GiB for v
+allocating 271.222107 GiB for p
+allocating 271.222107 GiB for g
+allocating 13602.315430 GiB for activations
+m+v consumes 7.123529 % of memory space
+p+g consumes 3.561764 % of memory space
+activation consumes 89.314713 % of memory space
+-----------------
+GPT-300B, BatchSize 4
+allocating 1155.271606 GiB for m
+allocating 1155.271606 GiB for v
+allocating 577.635803 GiB for p
+allocating 577.635803 GiB for g
+allocating 678.761841 GiB for activations
+m+v consumes 55.748592 % of memory space
+p+g consumes 27.874296 % of memory space
+activation consumes 16.377110 % of memory space
+-----------------
+GPT-300B, BatchSize 8
+allocating 1155.271606 GiB for m
+allocating 1155.271606 GiB for v
+allocating 577.635803 GiB for p
+allocating 577.635803 GiB for g
+allocating 1357.523682 GiB for activations
+m+v consumes 47.903404 % of memory space
+p+g consumes 23.951702 % of memory space
+activation consumes 28.144899 % of memory space
+-----------------
+GPT-300B, BatchSize 16
+allocating 1155.271606 GiB for m
+allocating 1155.271606 GiB for v
+allocating 577.635803 GiB for p
+allocating 577.635803 GiB for g
+allocating 2715.047363 GiB for activations
+m+v consumes 37.382217 % of memory space
+p+g consumes 18.691109 % of memory space
+activation consumes 43.926682 % of memory space
+-----------------
+GPT-300B, BatchSize 32
+allocating 1155.271606 GiB for m
+allocating 1155.271606 GiB for v
+allocating 577.635803 GiB for p
+allocating 577.635803 GiB for g
+allocating 5430.094727 GiB for activations
+m+v consumes 25.973099 % of memory space
+p+g consumes 12.986549 % of memory space
+activation consumes 61.040359 % of memory space
+-----------------
+GPT-300B, BatchSize 64
+allocating 1155.271606 GiB for m
+allocating 1155.271606 GiB for v
+allocating 577.635803 GiB for p
+allocating 577.635803 GiB for g
+allocating 10860.189453 GiB for activations
+m+v consumes 16.128317 % of memory space
+p+g consumes 8.064158 % of memory space
+activation consumes 75.807533 % of memory space
+-----------------
+GPT-300B, BatchSize 128
+allocating 1155.271606 GiB for m
+allocating 1155.271606 GiB for v
+allocating 577.635803 GiB for p
+allocating 577.635803 GiB for g
+allocating 21720.378906 GiB for activations
+m+v consumes 9.173848 % of memory space
+p+g consumes 4.586924 % of memory space
+activation consumes 86.239227 % of memory space
