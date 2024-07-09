@@ -34,6 +34,7 @@ void gpt2_build_from_size(GPT2 *model, int size, int B, int T) {
     else if (size == 70) { depth = 60; channels = 10240; num_heads = 80; } // 70B
     else if (size == 145) { depth = 80; channels = 12288; num_heads = 96; } // 145B
     else if (size == 300) { depth = 96; channels = 16384; num_heads = 128; } // 300B
+    else if (size == 1000) { depth = 128; channels = 25600; num_heads = 160; } // 1T
     else { fprintf(stderr, "Unsupported size for now\n"); exit(EXIT_FAILURE); }
 
     model->config.num_layers = depth;
@@ -77,17 +78,18 @@ void gpt2_build_from_size(GPT2 *model, int size, int B, int T) {
 
 
 int main(int argc, char *argv[]) {
-    int ModelSize[4] = {7, 70, 145, 300};
-    int BatchSize[6] = {4, 8, 16, 32, 64, 128};
+    int ModelSize[5] = {7, 70, 145, 300, 1000};
+    int BatchSize[8] = {1, 4, 8, 16, 32, 64, 128, 256};
 
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 5; i++) {
+        printf("\n");
         int model_size = ModelSize[i];
-        for (int j = 0; j < 6; j++) {
+        for (int j = 0; j < 8; j++) {
             int B = BatchSize[j];
             int T = 2048;
 
             printf("-----------------\n");
-            printf("GPT-%dB, BatchSize %d\n", model_size, B);
+            printf("GPT-%dB, BatchSize %d, Sequence Length %d\n", model_size, B, T);
 
             // build the GPT-2 model by model size
             GPT2 model;
